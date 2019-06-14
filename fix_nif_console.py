@@ -1,57 +1,54 @@
 #!/usr/bin/env python
 import argparse, re, os
+from pathlib import Path
 from pyffi.formats.nif import NifFormat
 
-def main(args):
-    dryrun = args.dryrun
-    regex = None
-    if args.regex is not None:
-        regex = re.compile(args.regex)
+def process_dir(dir, is_dryrun):
     file_changed = False
     for stream, data in NifFormat.walkData(args.dir):
         try:
             # the replace call makes the doctest also pass on windows
-            os_path = stream.name
-            split = (os_path.split(os.sep))[-5:]
-            rejoin = os.path.join(*split).replace(os.sep, "/")
-            print("reading %s" % rejoin)
+            filename = Path(stream.name)
+            print("reading %s" % filename)
             data.read(stream)
             for block in data.blocks:
-                if is_block_to_be_removed(block, regex):
-                    print('removing %s node' % type(block).__name__)
+                # Remove NiTexture effect blocks
+                if isinstance(block, NifFormat.NiTextureEffect):
+                    print('\tremoving NiTextureEffect block')
                     data.replace_global_node(block, None)
                     file_changed = True
+
+                # Remove NiSourceTextures for bump maps
+                elif (isinstance(block, NifFormat.NiTexturingProperty)
+                        and block.has_bump_map_texture):
+                    source_block = block.bump_map_texture.source
+                    bump_map_file = str(source_block.file_name)
+                    print('\tremoving NiSourceTexture block with file name %s' % bump_map_file)
+                    data.replace_global_node(source_block, None)
+                    # Remove reference
+                    block.has_bump_map_texture = False
+                    file_changed = True
+
+            stream.close()
+
             # Output
-            if file_changed and not dryrun:
-                print('writing to %s' % filename)
-                stream.close()
+            if file_changed and not is_dryrun:
+                print('\twriting to %s' % filename)
                 output = open(filename, 'wb')
                 data.write(output)
                 output.close()
+
         except Exception as e:
             print('Error reading file %s' % e)
-
-def is_block_to_be_removed(block, regex):
-    if (regex is not None 
-            and isinstance(block, NifFormat.NiSourceTexture)
-            and regex.search(str(block.get_attribute('file_name')))):
-        return True
-    if isinstance(block, NifFormat.NiTextureEffect):
-        return True
-    return False
 
 if __name__ == '__main__':
     try:
         parser = argparse.ArgumentParser()
         parser.add_argument('--dryrun', action='store_true',
                 help='Print out node deletions and then exit without replacing files')
-        parser.add_argument('--regex',
-                help=(
-                    'The regular expression to use to match NiSourceTextures. '
-                    'If none provided then this step is skipped').format())
         parser.add_argument('dir', help='The root directory to scan for .nif files.')
         args = parser.parse_args()
     except Exception:
         parser.print_help()
         raise SystemExit()
-    main(args)
+process_dir(args.dir, args.dryrun)
