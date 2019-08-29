@@ -58,7 +58,7 @@ class App(QWidget):
 
     def set_info(self, info):
         """Sets the contents of the notification TextEdit"""
-        self.contents.setText(self.help)
+        self.contents.setText(info)
 
     def fix_and_clean(self):
         """Runs the main processing script"""
@@ -68,8 +68,8 @@ class App(QWidget):
         """Checks if the run will actually be attempted"""
         if self.dry_run_checkbox.isChecked():
             self.is_dryrun = True
-        else:
-            self.is_dryrun = False
+        # else:
+        #     self.is_dryrun = False
 
 
 def run_app():
