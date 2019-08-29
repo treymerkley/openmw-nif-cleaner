@@ -1,13 +1,17 @@
+"""Module for processing the data"""
 from pathlib import Path
 from pyffi.formats.nif import NifFormat
 
+
 class Processor:
+    """Initializing th msg_handler"""
     def __init__(self, msg_handler):
         self.msg_handler = msg_handler
 
-    def process_dir(self, dir, is_dryrun):
+    def process_dir(self, directory, is_dryrun):
+        """Main processing class"""
         file_changed = False
-        for stream, data in NifFormat.walkData(dir):
+        for stream, data in NifFormat.walkData(directory):
             try:
                 filename = Path(stream.name)
                 self.msg_handler("reading %s" % filename)
@@ -41,4 +45,3 @@ class Processor:
 
             except Exception as e:
                 self.msg_handler('Error reading file %s' % e)
-
