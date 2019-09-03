@@ -1,9 +1,9 @@
 """The Qt interface"""
 
 import sys
-from PyQt5.QtWidgets import (QHBoxLayout, QVBoxLayout, QCheckBox,
-                             QPushButton, QTextEdit, QFileDialog,
-                             QLineEdit, QApplication, QWidget)
+from PySide2.QtWidgets import (QHBoxLayout, QVBoxLayout, QCheckBox,
+                               QPushButton, QTextEdit, QFileDialog,
+                               QLineEdit, QApplication, QWidget)
 from processor import Processor
 
 
