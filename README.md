@@ -11,6 +11,6 @@ ONC depends on:
 + (Optional) PySide2 >= 5.13.0-2
 
 ## Running
-You can run this on any directory to get clean NIFs at the end. However, it's important to know that this can break some mods. Better clothes, for instance, breaks from using this. To mitigate that, use =ori= in the console to find where a broken mod comes from and re-add it to your mod directory.
+You can run this on any directory to get clean NIFs at the end. However, it's important to know that this can break some mods. Better clothes, for instance, breaks from using this. To mitigate that, use `ori` in the console to find where a broken mod comes from and re-add it to your mod directory.
 
 Once you have these installed, simply clone the files and run either the console version or the Qt version for a GUI.
