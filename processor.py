@@ -10,9 +10,9 @@ class Processor:
 
     def process_dir(self, directory, is_dryrun):
         """Main processing class"""
-        file_changed = False
         for stream, data in NifFormat.walkData(directory):
             try:
+                file_changed = False
                 filename = Path(stream.name)
                 self.msg_handler("reading %s" % filename)
                 data.read(stream)
